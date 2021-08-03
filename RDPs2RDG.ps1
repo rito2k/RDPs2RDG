@@ -21,10 +21,10 @@
     Defines the name for the group node containing the remote servers to connect to. Default is "MyWorkspace"
 
  .EXAMPLE
-    RDPs2RDCMan.ps1 -DefaultLogonName WsAdm -RdpFilesPath C:\RDPs -WorkspaceName MyWorkspace
+    RDPs2RDG.ps1 -DefaultLogonName WsAdm -RdpFilesPath C:\RDPs -WorkspaceName MyWorkspace
 
  .NOTES
-     File Name  : RDPs2RDCMan.ps1
+     File Name  : RDPs2RDG.ps1
      Author     : Alvaro López (alvaro.lopez@microsoft.com)
      Version    : 1.0
      Date       : Aug 2nd, 2021
