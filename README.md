@@ -1,5 +1,5 @@
 # RDPs2RDG
-This script loops through all valid RDP Files in a provided folder path, extracts machine and logon name for each of them and generates a Remote Desktop Connection Manager group file for your convenience.
+This script loops through all valid RDP Files in a provided folder path, extracts machine and logon name for each of them and generates a Remote Desktop Connection Manager group (RDG) file for your convenience.
 
 ## Table of Contents
 
