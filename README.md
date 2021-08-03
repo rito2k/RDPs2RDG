@@ -9,10 +9,7 @@ This script loops through all valid RDP Files in a provided folder path, extract
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)    
   - [Usage](#usage)
-  - [Contributing](#contributing)
   - [License](#license)
-  - [Contact](#contact)
-
 
 ## About The Project
 
