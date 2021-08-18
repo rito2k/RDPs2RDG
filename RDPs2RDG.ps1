@@ -5,12 +5,17 @@
  .DESCRIPTION  
      This script loops through all valid RDP Files in a provided folder path, extracts machine and logon name for each of them and generates a Remote Desktop Connection Manager group file for your convenience.
      Provide the default logon user name to connect to the remote machines with. If not provided, "Administrator" will be used.
+     Provide the default logon domain name to connect to the remote machines with. If not provided, "MyDomain" will be used.
      Provide the path to the existing RDP files to generate the RDCMan file from. If not provided, the path where the script is located will be used.
      Provide the name for the group node containing the remote servers to connect to. If not provided, "MyWorkspace" will be used.     
                
  .PARAMETER DefaultLogonName
     (OPTIONAL)
     Defines the logon user name to connect to the remote machines with. If not provided, "Administrator" will be used.
+
+ .PARAMETER DefaultLogonDomain
+    (OPTIONAL)
+    Defines the logon domain name to connect to the remote machines with. If not provided, "MyDomain" will be used.
 
  .PARAMETER RdpFilesPath
     (OPTIONAL)
@@ -21,13 +26,13 @@
     Defines the name for the group node containing the remote servers to connect to. Default is "MyWorkspace"
 
  .EXAMPLE
-    RDPs2RDG.ps1 -DefaultLogonName WsAdm -RdpFilesPath C:\RDPs -WorkspaceName MyWorkspace
+    RDPs2RDG.ps1 -DefaultLogonName WsAdm -DefaultLogonDomain mydomain -RdpFilesPath C:\RDPs -WorkspaceName MyWorkspace
 
  .NOTES
      File Name  : RDPs2RDG.ps1
      Author     : Alvaro López (alvaro.lopez@microsoft.com)
-     Version    : 1.0
-     Date       : Aug 2nd, 2021
+     Version    : 2.0
+     Date       : Aug 18th, 2021
 
      You can download the latest Remote Desktop Connection Manager version at https://aka.ms/rdcman
 #>
@@ -35,6 +40,8 @@
 Param (
     [Parameter(Mandatory=$false)]
 	[string]$DefaultLogonName = "Administrator",
+    [Parameter(Mandatory=$false)]
+	[string]$DefaultLogonDomain = "MyDomain",
     [Parameter(Mandatory=$false)]
     [string]$RdpFilesPath,
     [Parameter(Mandatory=$false)]
@@ -56,7 +63,7 @@ else {
 }
 
 try {
-    if (!($RdpFiles = gci $RdpFilesPath -Filter "*.rdp")){
+    if (!($RdpFiles = Get-ChildItem $RdpFilesPath -Filter "*.rdp")){
         Write-Host "No RDP files found in '$RdpFilesPath'!" -ForegroundColor Red
         Exit
     }
@@ -102,7 +109,7 @@ $xmlsb = '<?xml version="1.0" encoding="utf-8"?>
         <profileName scope="Local">Custom</profileName>
         <userName>$DefaultLogonName</userName>
         <password />
-        <domain>.</domain>
+        <domain>$DefaultLogonDomain</domain>
       </logonCredentials>
     </group>
   </file>
@@ -114,6 +121,7 @@ $xmlsb = '<?xml version="1.0" encoding="utf-8"?>
 #Interpret & replace variable value
 $xmlsb = $xmlsb.Replace('$WorkspaceName',$WorkspaceName)
 $xmlsb = $xmlsb.Replace('$DefaultLogonName',$DefaultLogonName)
+$xmlsb = $xmlsb.Replace('$DefaultLogonDomain',$DefaultLogonDomain)
 
 #Transform string to XML structure
 $xml = [xml]$xmlsb
@@ -128,7 +136,7 @@ If ($debugging) {Write-Host "Adding remote machines to $NewRDCFile . . ." -Foreg
 
 #Loop through RDP files and collect machine name as "connection strings"
 
-$RdpFiles = gci $RdpFilesPath -Filter "*.rdp"
+$RdpFiles = Get-ChildItem $RdpFilesPath -Filter "*.rdp"
 foreach ($RdpFile in $RdpFiles)
 {
     try{
