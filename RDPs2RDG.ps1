@@ -63,7 +63,7 @@ else {
 }
 
 try {
-    if (!($RdpFiles = gci $RdpFilesPath -Filter "*.rdp")){
+    if (!($RdpFiles = Get-ChildItem $RdpFilesPath -Filter "*.rdp")){
         Write-Host "No RDP files found in '$RdpFilesPath'!" -ForegroundColor Red
         Exit
     }
@@ -136,7 +136,7 @@ If ($debugging) {Write-Host "Adding remote machines to $NewRDCFile . . ." -Foreg
 
 #Loop through RDP files and collect machine name as "connection strings"
 
-$RdpFiles = gci $RdpFilesPath -Filter "*.rdp"
+$RdpFiles = Get-ChildItem $RdpFilesPath -Filter "*.rdp"
 foreach ($RdpFile in $RdpFiles)
 {
     try{
