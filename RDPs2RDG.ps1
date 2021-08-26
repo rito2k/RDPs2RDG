@@ -30,7 +30,7 @@
 
  .NOTES
      File Name  : RDPs2RDG.ps1
-     Author     : Alvaro López (alvaro.lopez@microsoft.com)
+     Author     : https://github.com/rito2k/RDPs2RDG
      Version    : 2.0
      Date       : Aug 18th, 2021
 
