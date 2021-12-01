@@ -38,7 +38,7 @@
     Switch to turn on extra debug logging 
 
  .EXAMPLE
-    RDPs2RDG.ps1 -DefaultLogonName WsAdm -DefaultLogonDomain mydomain -RdpFilesPath C:\RDPs -WorkspaceName MyWorkspace
+    RDPs2RDG.ps1 -DefaultLogonName WsAdm -DefaultLogonDomain mydomain -RdpFilesPath C:\RDPs -WorkspaceName MyWorkspace -Users "jsmith,mroony,aguy" -DefaultPassword "testPassword"
 
  .NOTES
      File Name  : RDPs2RDG.ps1
