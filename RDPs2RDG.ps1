@@ -204,8 +204,8 @@ foreach ($RdpFile in $RdpFiles)
     }
 }#for-each RDP file
 
-if($users.Length -gt 0){
-    $userArray =  $users.Split($(",;".ToCharArray()))
+if($Users.Length -gt 0){
+    $userArray =  $Users.Split($(",;".ToCharArray()))
     foreach($user in $userArray){
         $profileTemplate = @"
             <credentialsProfile inherit="None">
@@ -216,7 +216,7 @@ if($users.Length -gt 0){
             </credentialsProfile>
 "@
 
-            $encPass = encryptPass -plaintext $defaultPassword
+            $encPass = encryptPass -plaintext $DefaultPassword
 
             [xml]$xmlTemplate = $profileTemplate -f $DefaultLogonDomain, $user, $encPass
 
@@ -229,7 +229,7 @@ if($users.Length -gt 0){
                 If ($debugging) {Write-Host "Added user credentials for: '$user'" -ForegroundColor Cyan}
             }
     }#for-each user
-}#if users specified
+}#if Users specified
 
 #Save final RDCMan file
 $RDCConfig.Save($NewRDCFile)
