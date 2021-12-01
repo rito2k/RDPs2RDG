@@ -25,6 +25,18 @@
     (OPTIONAL)
     Defines the name for the group node containing the remote servers to connect to. Default is "MyWorkspace"
 
+ .PARAMETER Users
+    (OPTIONAL)
+    Comma or semi-colon delimited list of usernames for login profiles. Leave the domain off the username, it derives it from the DefaultLogonDomain parameter
+
+ .PARAMETER DefaultPassword
+    (OPTIONAL)
+    Default password used for all user accounts in test environments. This will store the password encrypted in the RDG file using the Windows ProtectedData API.
+
+ .PARAMETER debugging
+    (OPTIONAL)
+    Switch to turn on extra debug logging 
+
  .EXAMPLE
     RDPs2RDG.ps1 -DefaultLogonName WsAdm -DefaultLogonDomain mydomain -RdpFilesPath C:\RDPs -WorkspaceName MyWorkspace
 
@@ -46,8 +58,23 @@ Param (
     [string]$RdpFilesPath,
     [Parameter(Mandatory=$false)]
     [string]$WorkspaceName = "MyWorkspace",
+    [Parameter(Mandatory=$false)]
+    [string]$Users,
+    [Parameter(Mandatory=$false)]
+    [string]$DefaultPassword,
     [switch]$debugging
 )
+
+Add-Type -AssemblyName System.Security
+    
+
+function encryptPass($plaintext){
+    $bytetext = [System.Text.Encoding]::Unicode.GetBytes($plaintext)
+
+    #$scope = [System.Security.Cryptography.DataProtectionScope]::CurrentUser = 0
+    $protectedPass = [System.Security.Cryptography.ProtectedData]::Protect($bytetext,$null,0)
+    return [System.Convert]::ToBase64String($protectedPass)
+}
 
 $Time1=Get-Date
 
@@ -176,6 +203,33 @@ foreach ($RdpFile in $RdpFiles)
         }
     }
 }#for-each RDP file
+
+if($users.Length -gt 0){
+    $userArray =  $users.Split($(",;".ToCharArray()))
+    foreach($user in $userArray){
+        $profileTemplate = @"
+            <credentialsProfile inherit="None">
+                    <profileName scope="Local">{0}\{1}</profileName>
+                    <userName>{1}</userName>
+                    <password>{2}</password>
+                    <domain>{0}</domain>
+            </credentialsProfile>
+"@
+
+            $encPass = encryptPass -plaintext $defaultPassword
+
+            [xml]$xmlTemplate = $profileTemplate -f $DefaultLogonDomain, $user, $encPass
+
+            $New = $RDCConfig.ImportNode($xmlTemplate.credentialsProfile, $true)
+
+            try
+                {$RDCConfig.RDCMan.file.GetElementsByTagName('credentialsProfiles').AppendChild($New)| out-null}
+            Finally
+            {
+                If ($debugging) {Write-Host "Added user credentials for: '$user'" -ForegroundColor Cyan}
+            }
+    }#for-each user
+}#if users specified
 
 #Save final RDCMan file
 $RDCConfig.Save($NewRDCFile)
