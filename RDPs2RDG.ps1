@@ -8,7 +8,7 @@
      Provide the default logon domain name to connect to the remote machines with. If not provided, "MyDomain" will be used.
      Provide the path to the existing RDP files to generate the RDCMan file from. If not provided, the path where the script is located will be used.
      Provide the name for the group node containing the remote servers to connect to. If not provided, "MyWorkspace" will be used.
-     Provide a comma or semi-colon delimited list of usernames for creating login profiles. If you do, please also provide the corresponding password for all of them.
+     Provide the comma or semi-colon delimited list of usernames for creating login profiles. If you do, please also provide the corresponding password for all of them.
                
  .PARAMETER DefaultLogonName
     (OPTIONAL)
