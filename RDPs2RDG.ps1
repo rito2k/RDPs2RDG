@@ -13,6 +13,7 @@
  .PARAMETER DefaultLogonName
     (OPTIONAL)
     Defines the logon user name to connect to the remote machines with. If not provided, "Administrator" will be used.
+    If there is already a defined username in the RDP file, this will be used and this parameter value will be ignored.
 
  .PARAMETER DefaultLogonDomain
     (OPTIONAL)
@@ -44,10 +45,12 @@
  .NOTES
      File Name  : RDPs2RDG.ps1
      Author     : https://github.com/rito2k/RDPs2RDG
-     Version    : 3.0
+     Version    : 3.1
      Date       : Dec 22nd, 2021
 
      You can download the latest Remote Desktop Connection Manager version at https://docs.microsoft.com/en-us/sysinternals/downloads/rdcman
+
+     
 #>
 
 Param (
@@ -128,6 +131,19 @@ $xmlsb = '<?xml version="1.0" encoding="utf-8"?>
       <fullScreen>False</fullScreen>
       <colorDepth>24</colorDepth>
     </remoteDesktop>
+    <localResources inherit="None">
+      <audioRedirection>Remote</audioRedirection>
+      <audioRedirectionQuality>Dynamic</audioRedirectionQuality>
+      <audioCaptureRedirection>DoNotRecord</audioCaptureRedirection>
+      <keyboardHook>Remote</keyboardHook>
+      <redirectClipboard>True</redirectClipboard>
+      <redirectDrives>False</redirectDrives>
+      <redirectDrivesList />
+      <redirectPrinters>False</redirectPrinters>
+      <redirectPorts>False</redirectPorts>
+      <redirectSmartCards>False</redirectSmartCards>
+      <redirectPnpDevices>False</redirectPnpDevices>
+    </localResources>
     <group>
       <properties>
         <expanded>True</expanded>
@@ -172,13 +188,17 @@ foreach ($RdpFile in $RdpFiles)
         if ($FullAdressString = Select-String -Path $RdpFile.FullName -Pattern "full address:s:" -SimpleMatch){
             $MachineConnectionString = $FullAdressString.Line.Trim().Substring(15)
         }
+        [string]$MachineName = $RdpFile.Name.Substring(0,$RdpFile.Name.LastIndexOf("."))
+        $MachineName=$MachineName.Replace('&','and')
+        $MachineName=$MachineName.Replace(">","")
+        $MachineName=$MachineName.Replace("<","")
+
         if ($UserNameString = Select-String -Path $RdpFile.FullName -Pattern "username:s:" -SimpleMatch){
             $UserName = $UserNameString.Line.Trim().Substring(11)
         }
         else {
             $UserName = $DefaultLogonName
-        }
-        $MachineName = $RdpFile.Name.Substring(0,$RdpFile.Name.LastIndexOf("."))
+        }        
     }
     catch{
         $MachineConnectionString = ""
@@ -188,13 +208,35 @@ foreach ($RdpFile in $RdpFiles)
         Write-Host "Warning: Could not find full address in '$RdpFile', please check it." -ForegroundColor Yellow
     }
     else {
-        [XML]$Server ="        
-        <server>
-            <properties>
-              <displayName>$MachineName</displayName>
-              <name>$MachineConnectionString</name>
-            </properties>
-         </server>"
+        if ($UserName -ne $DefaultLogonName){
+            #Create server XML object with not inherited credentials
+            $xmlserver = "
+            <server>
+                <properties>
+                <displayName>$MachineName</displayName>
+                <name>$MachineConnectionString</name>
+                </properties>
+                <logonCredentials inherit=""None"">
+                <profileName scope=""Local"">Custom</profileName>
+                <userName>$UserName</userName>
+                </logonCredentials>
+            </server>"
+
+            #Interpret & replace variable values
+            $xmlserver = $xmlserver.Replace('$WorkspaceName',$WorkspaceName)
+
+            #Transform string to XML structure
+            $Server = [xml]$xmlserver
+        }
+        else{
+            [XML]$Server ="
+            <server>
+                <properties>
+                <displayName>$MachineName</displayName>
+                <name>$MachineConnectionString</name>
+                </properties>
+            </server>"
+        }
         $New = $RDCConfig.ImportNode($Server.Server, $true)
         try
             {$RDCConfig.RDCMan.file.group.AppendChild($New) | out-null}
