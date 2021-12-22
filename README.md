@@ -41,7 +41,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Version History
 
-- 20211222 (v3.1): If username exists in the original RDP file, it will be honored and not overwritten with DefaultLogonName value. Also added property to send KeyCombos to the remote machine, even if not in Full Screen.
-- 20211205 (v3.0): Added the ability to create user profiles (thanks to westleyMS)
+- 20211222 (v3.1): If username exists in the original RDP file, it will be honored and not overwritten with DefaultLogonName value. Also added property to send KeyCombos to the remote machine, even if not in Full Screen. Fixed parsing error with special chars (&,<,>)
+- 20211205 (v3.0): Added the ability to create user profiles (thanks to @westleyMS)
 - 20210818 (v2.0): Improved inheritance of connection properties and RDP settings
 - 20210803 (v1.0): First release with basic automated functionality
