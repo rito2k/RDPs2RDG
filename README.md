@@ -45,5 +45,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 - 20211205 (v3.0): Added the ability to create user profiles (thanks to westleyMS)
 - 20210818 (v2.0): Improved inheritance of connection properties and RDP settings
 - 20210803 (v1.0): First release with basic automated functionality
-
-
