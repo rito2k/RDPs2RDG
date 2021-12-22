@@ -10,7 +10,11 @@ This script loops through all valid RDP Files in a provided folder path, extract
     - [Prerequisites](#prerequisites)    
   - [Usage](#usage)
   - [License](#license)
+<<<<<<< HEAD
   - [Version history](#version-History)
+=======
+  - [Version history](#versionHistory)
+>>>>>>> 95bd9b988a77c5787778a70b7fd630550ae20dcf
 
 ## About The Project
 
@@ -45,5 +49,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 - 20211205 (v3.0): Added the ability to create user profiles (thanks to westleyMS)
 - 20210818 (v2.0): Improved inheritance of connection properties and RDP settings
 - 20210803 (v1.0): First release with basic automated functionality
-
-
